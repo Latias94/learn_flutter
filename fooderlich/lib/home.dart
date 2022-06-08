@@ -16,7 +16,7 @@ class _HomeState extends State<Home> {
   static List<Widget> pages = <Widget>[
     ExploreScreen(),
     RecipesScreen(),
-    GroceryScreen(),
+    const GroceryScreen(),
   ];
 
   @override
@@ -29,7 +29,7 @@ class _HomeState extends State<Home> {
             style: Theme.of(context).textTheme.headline6,
           ),
         ),
-        body: pages[tabManager.selectedTab],
+        body: IndexedStack(index: tabManager.selectedTab, children: pages),
         bottomNavigationBar: BottomNavigationBar(
           selectedItemColor:
               Theme.of(context).textSelectionTheme.selectionColor,
