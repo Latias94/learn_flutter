@@ -4,11 +4,10 @@ import 'package:provider/provider.dart';
 import 'fooderlich_theme.dart';
 import 'models/models.dart';
 import 'navigation/app_router.dart';
+import 'navigation/app_route_parser.dart';
 
 void main() {
-  runApp(
-    const Fooderlich(),
-  );
+  runApp(const Fooderlich());
 }
 
 class Fooderlich extends StatefulWidget {
@@ -22,6 +21,8 @@ class _FooderlichState extends State<Fooderlich> {
   final _groceryManager = GroceryManager();
   final _profileManager = ProfileManager();
   final _appStateManager = AppStateManager();
+  final routeParser = AppRouteParser();
+
   late final AppRouter _appRouter = AppRouter(
     appStateManager: _appStateManager,
     groceryManager: _groceryManager,
@@ -41,10 +42,10 @@ class _FooderlichState extends State<Fooderlich> {
           create: (context) => _groceryManager,
         ),
         ChangeNotifierProvider(
-          create: (context) => _profileManager,
+          create: (context) => _appStateManager,
         ),
         ChangeNotifierProvider(
-          create: (context) => _appStateManager,
+          create: (context) => _profileManager,
         ),
       ],
       child: Consumer<ProfileManager>(
@@ -56,14 +57,12 @@ class _FooderlichState extends State<Fooderlich> {
             theme = FooderlichTheme.light();
           }
 
-          return MaterialApp(
+          return MaterialApp.router(
             theme: theme,
             title: 'Fooderlich',
-            // TODO: Replace with Router widget
-            home: Router(
-              routerDelegate: _appRouter,
-              backButtonDispatcher: RootBackButtonDispatcher(),
-            ),
+            backButtonDispatcher: RootBackButtonDispatcher(),
+            routeInformationParser: routeParser,
+            routerDelegate: _appRouter,
           );
         },
       ),
