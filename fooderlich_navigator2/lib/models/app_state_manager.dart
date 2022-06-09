@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
+import 'app_cache.dart';
+
 class FooderlichTab {
   static const int explore = 0;
   static const int recipes = 1;
@@ -12,6 +14,7 @@ class AppStateManager extends ChangeNotifier {
   bool _loggedIn = false;
   bool _onboardingComplete = false;
   int _selectedTab = FooderlichTab.explore;
+  final _appCache = AppCache();
 
   bool get isInitialized => _initialized;
 
@@ -21,7 +24,9 @@ class AppStateManager extends ChangeNotifier {
 
   int get getSelectedTab => _selectedTab;
 
-  void initializeApp() {
+  void initializeApp() async {
+    _loggedIn = await _appCache.isUserLoggedIn();
+    _onboardingComplete = await _appCache.didCompleteOnboarding();
     Timer(
       const Duration(milliseconds: 2000),
       () {
@@ -31,13 +36,15 @@ class AppStateManager extends ChangeNotifier {
     );
   }
 
-  void login(String username, String password) {
+  void login(String username, String password) async {
     _loggedIn = true;
+    await _appCache.cacheUser();
     notifyListeners();
   }
 
-  void completeOnboarding() {
+  void completeOnboarding() async {
     _onboardingComplete = true;
+    await _appCache.completeOnboarding();
     notifyListeners();
   }
 
@@ -51,11 +58,10 @@ class AppStateManager extends ChangeNotifier {
     notifyListeners();
   }
 
-  void logout() {
-    _loggedIn = false;
-    _onboardingComplete = false;
+  void logout() async {
     _initialized = false;
     _selectedTab = 0;
+    await _appCache.invalidate();
 
     initializeApp();
     notifyListeners();
